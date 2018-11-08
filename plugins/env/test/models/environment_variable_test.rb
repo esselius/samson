@@ -43,6 +43,40 @@ describe EnvironmentVariable do
       EnvironmentVariable.env(Project.new, 123).must_equal({})
     end
 
+    describe "get env vars from GitHub" do
+      with_env DEPLOYMENT_ENV_REPO: "organization/repo_name"
+      before do
+        project.use_env_repo = true
+      end
+
+      it "returns a processed env hash" do
+        stub_github_api(
+          "repos/organization/repo_name/contents/generated/foo/pod100.env",
+          "FROM_REPO_VAR_ONE=one\nVAR_TWO=two\n"
+        )
+        expected_result = {"FROM_REPO_VAR_ONE" => "one", "VAR_TWO" => "two"}
+        EnvironmentVariable.env(project, deploy_group).must_equal expected_result
+      end
+
+      it "shows error when file does not exist" do
+        stub_github_api("repos/organization/repo_name/contents/generated/foo/pod100.env", "No content", 404)
+        assert_raises(Samson::Hooks::UserError) do
+          EnvironmentVariable.env(project, deploy_group)
+        end
+      end
+
+      it "Does not get env vars from GitHub if project is not selected" do
+        project.use_env_repo = false
+        stub_github_api(
+          "repos/organization/repo_name/contents/generated/foo/pod100.env",
+          "VAR_THREE=three\nVAR_FOUR=four\n"
+        )
+        expected_result = {"VAR_THREE" => "three", "VAR_FOUR" => "four"}
+        EnvironmentVariable.env(project, deploy_group).wont_equal expected_result
+
+      end
+    end
+
     describe "with an assigned group and variables" do
       before do
         project.environment_variable_groups = EnvironmentVariableGroup.all
