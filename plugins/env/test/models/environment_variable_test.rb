@@ -73,7 +73,6 @@ describe EnvironmentVariable do
         )
         expected_result = {"VAR_THREE" => "three", "VAR_FOUR" => "four"}
         EnvironmentVariable.env(project, deploy_group).wont_equal expected_result
-
       end
     end
 

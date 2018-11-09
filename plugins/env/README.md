@@ -5,21 +5,20 @@ Includes `/projects/:permalink/environment?deploy_group=permalink` endpoint that
 for a project and deploy_group.
 
 ## GitHub to manage environment variables
-This plugin has an option to use GitHub repository for .env files.  Using GitHub provides better control
-of the environment variables applied to each deploy group and provides the ability to have peer reveiw of 
-environment variable changes.  Each project must opt-in to use this feature.
+This plugin has an option to use GitHub repository as source for environment variables Each project must opt-in to 
+use this feature.
 
-To enable the feature for an instance of Samson add the environment variable DEPLOYMENT_ENV_REPO and set it 
-to the the organization and repository that has the .env files.   You should set this in the .env file used
-by the samson rails application.
-For example:
+To enable the feature set the environment variable DEPLOYMENT_ENV_REPO to the organization 
+and repository for the deployment environment variables `.env`.  For an
+organization named `my_organization` and the repository named `deployment_environment_config` put this in Samson's 
+`.env` file:
 
-`DEPLOYMENT_ENV_REPO=my-orgainization/deployment_environmet_config`
+`DEPLOYMENT_ENV_REPO=my_organization/deployment_environment_config`
 
-The expected structure of this repository is a directory named generated with a sub directory for each 
-project samson deploys.  Within this directory for a project are the deploy group .env files using the name
-of the deploy group with a `.env` extension.  For example, you may a project named data_processor and 
-the deploy groups it can run are staging1 and prod1 and prod2.   Given this structure this feature expects:
+The expected structure of this repository is a directory named `generated` with a sub directory for each 
+_project permalink_ samson deploys.  Within this directory for a project are the deploy group .env files using the name
+of the _deploy group permalink_ with a `.env` extension.  For a project with the permalink `data_processor` and 
+the deploy group permalinks `staging1`, `prod1` and `prod2` we expect to see this directory tree:
 ```bash
 # ls ./
 generated
