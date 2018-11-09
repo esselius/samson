@@ -1,11 +1,11 @@
 ## Env Plugin
 Plugin to manage ENV settings for projects and write .env files during deploy.
 
-Includes `/projects/:permalink/environment?deploy_group=permalink` endpoint that returns the .env content
+Includes `/projects/:permalink/environment?deploy_group=permalink` endpoint that returns the `.env` content
 for a project and deploy_group.
 
 ## GitHub to manage environment variables
-This plugin has an option to use GitHub repository as source for environment variables Each project must opt-in to 
+This plugin has an option to use GitHub repository as source for environment variables. Each project must opt-in to 
 use this feature.
 
 To enable the feature set the environment variable DEPLOYMENT_ENV_REPO to the organization 
