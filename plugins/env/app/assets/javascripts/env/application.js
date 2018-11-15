@@ -5,7 +5,7 @@
     var obj = {};
 
     // convert Buffers before splitting into lines and processing
-    src.toString().split('\n').forEach(function (line) {
+    src.toString().split('\\n').forEach(function (line) {
       // matching "KEY' and 'VAL' in 'KEY=VAL'
       var keyValueArr = line.match(/^\s*([\w\.\-]+)\s*=\s*(.*)?\s*$/);
       // matched?
