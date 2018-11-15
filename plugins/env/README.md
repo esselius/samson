@@ -35,4 +35,9 @@ SECRETE_TOKEN=/secrets/SECRET_TOKEN
 RAILS_THREAD_MIN=3
 RAILS_THREAD_MAX=5 
 ```
+###### Merging envs stored in the database
+The generated enviornment variables is merger of deploy_group env variables, if the samson `deploy_group plugin` is 
+activated, the `project` environment variables in the samson database and the environment variables in the github `repo`.
+The order of precedence for variables with the same key name: `deploy_group` replaces `project` which replaces `repo`
+variables.
     

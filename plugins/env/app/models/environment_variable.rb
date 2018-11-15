@@ -19,16 +19,14 @@ class EnvironmentVariable < ActiveRecord::Base
     # but return a value with a helpful message
     # also used by an external plugin
     def env(project, deploy_group, preview: false, resolve_secrets: true)
-      env =
-        if (env_repo_name = ENV["DEPLOYMENT_ENV_REPO"]) && project.use_env_repo
-          env_vars_from_repo(env_repo_name, project, deploy_group)
-        else
-          env_vars_from_db(project, deploy_group)
-        end
-
+      repo_vars = {}
+      if (env_repo_name = ENV["DEPLOYMENT_ENV_REPO"]) && project.use_env_repo
+        repo_vars = env_vars_from_repo(env_repo_name, project, deploy_group)
+      end
+      env = env_vars_from_db(project, deploy_group)
+      env = repo_vars.merge(env) unless repo_vars.empty?
       resolve_dollar_variables(env)
       resolve_secrets(project, deploy_group, env, preview: preview) if resolve_secrets
-
       env
     end
 

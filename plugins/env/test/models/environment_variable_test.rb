@@ -58,6 +58,32 @@ describe EnvironmentVariable do
         EnvironmentVariable.env(project, deploy_group).must_equal expected_result
       end
 
+      it "returns a merges db env and repo env hashes" do
+        project.environment_variable_groups = EnvironmentVariableGroup.all
+        project.environment_variables.create!(name: "PROJECT", value: "PROJECT")
+        stub_github_api(
+          "repos/organization/repo_name/contents/generated/foo/pod100.env",
+          "FROM_REPO_VAR_ONE=one\nVAR_TWO=two\n"
+        )
+        expected_result = {"FROM_REPO_VAR_ONE" => "one", "VAR_TWO" => "two",
+                           "PROJECT" => "PROJECT", "Z" => "A", "X" => "Y", "Y" => "Z"}
+        EnvironmentVariable.env(project, deploy_group).must_equal expected_result
+      end
+
+      it "returns env hash precedence: deploy env then db env then repo env" do
+        project.environment_variable_groups = EnvironmentVariableGroup.all
+        project.environment_variables.create!(name: "PROJECT", value: "DEPLOY", scope: deploy_group)
+        project.environment_variables.create!(name: "PROJECT", value: "PROJECT")
+        project.environment_variables.create!(name: "VAR_TWO", value: "db_two")
+        stub_github_api(
+          "repos/organization/repo_name/contents/generated/foo/pod100.env",
+          "FROM_REPO_VAR_ONE=one\nVAR_TWO=two\nPROJECT=NOT_PROJECT"
+        )
+        expected_result = {"FROM_REPO_VAR_ONE" => "one", "VAR_TWO" => "db_two",
+                           "PROJECT" => "DEPLOY", "Z" => "A", "X" => "Y", "Y" => "Z"}
+        EnvironmentVariable.env(project, deploy_group).must_equal expected_result
+      end
+
       it "shows error when file does not exist" do
         stub_github_api("repos/organization/repo_name/contents/generated/foo/pod100.env", "No content", 404)
         assert_raises(Samson::Hooks::UserError) do
